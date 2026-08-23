@@ -116,14 +116,14 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 /* pista tipo forest plot */
 .track{margin:16px 0 15px}
-.rail{position:relative; display:grid; grid-template-columns:repeat(6,1fr); align-items:center; height:16px}
-.rail::before{content:""; position:absolute; left:8.333%; right:8.333%; top:50%; height:1px; background:var(--rule-2); transform:translateY(-50%)}
-.rail .fill{position:absolute; left:8.333%; top:50%; height:2px; background:var(--accent); transform:translateY(-50%)}
+.rail{position:relative; display:grid; align-items:center; height:16px}
+.rail::before{content:""; position:absolute; left:calc(50% / var(--n,7)); right:calc(50% / var(--n,7)); top:50%; height:1px; background:var(--rule-2); transform:translateY(-50%)}
+.rail .fill{position:absolute; left:calc(50% / var(--n,7)); top:50%; height:2px; background:var(--accent); transform:translateY(-50%)}
 .node{justify-self:center; position:relative; width:8px; height:8px; border-radius:50%; background:var(--surface); border:1.5px solid var(--rule-2); box-sizing:border-box}
 .node.done{background:var(--accent); border-color:var(--accent)}
 .node.on{width:11px; height:11px; border-radius:2px; background:var(--accent); border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-soft)}
-.tlabels{display:grid; grid-template-columns:repeat(6,1fr); margin-top:8px}
-.tlabels .tl{font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); text-align:center}
+.tlabels{display:grid; margin-top:8px}
+.tlabels .tl{font-family:"IBM Plex Mono",monospace; font-size:9px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); text-align:center}
 .tlabels .tl.on{color:var(--accent); font-weight:500}
 .tnow{display:none; font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); margin-top:8px}
 .tnow b{color:var(--accent); font-weight:500}
@@ -200,9 +200,9 @@ footer .mono{font-family:"IBM Plex Mono",monospace}
 
 <script>
 const DATA = /*__DATA__*/;
-const PIPE = ["En redacción","En proceso","Enviado","En peer review (R1)","Aceptado","Publicado"];
-const SHORT = {"En redacción":"Redacción","En proceso":"Proceso","Enviado":"Enviado","En peer review (R1)":"Peer review","Aceptado":"Aceptado","Publicado":"Publicado"};
-const TONE = {"Publicado":"ok","Aceptado":"ok","En peer review (R1)":"wait","Enviado":"wait","En proceso":"draft","En redacción":"draft","Rechazado":"stop","Sin estado":"draft"};
+const PIPE = ["En redacción","Por enviar a revista","Enviado","En peer review","En peer review (R1)","Aceptado","Publicado"];
+const SHORT = {"En redacción":"Redacción","Por enviar a revista":"Por enviar","Enviado":"Enviado","En peer review":"Peer review","En peer review (R1)":"Peer review R1","Aceptado":"Aceptado","Publicado":"Publicado"};
+const TONE = {"Publicado":"ok","Aceptado":"ok","En peer review (R1)":"wait","En peer review":"wait","Enviado":"wait","Por enviar a revista":"draft","En proceso":"draft","En redacción":"draft","Rechazado":"stop","Sin estado":"draft"};
 
 const norm = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9\u00f1]+/g," ").trim();
 const esc = s => (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -214,8 +214,8 @@ const count = st => R.filter(r => r.estado === st).length;
 document.getElementById("stats").innerHTML = [
   ["", R.length, "trabajos"],
   ["s-ok", count("Publicado") + count("Aceptado"), "publicados o aceptados"],
-  ["s-wait", count("Enviado") + count("En peer review (R1)"), "en revista"],
-  ["", count("En redacción") + count("En proceso"), "en redacción"],
+  ["s-wait", count("Enviado") + count("En peer review") + count("En peer review (R1)"), "en revista"],
+  ["", count("En redacción") + count("En proceso") + count("Por enviar a revista"), "en preparación"],
   ["s-stop", count("Rechazado"), "por reenviar"],
   ["", DATA.autores.length, "autores"]
 ].map(([c,n,l]) => `<div class="stat ${c}"><b>${n}</b><span>${l}</span></div>`).join("");
@@ -297,8 +297,8 @@ function trackSVG(estado){
   const nodes = PIPE.map((p,i) => `<span class="node ${i === idx ? "on" : (idx >= 0 && i < idx ? "done" : "")}"></span>`).join("");
   const labels = PIPE.map((p,i) => `<span class="tl${i === idx ? " on" : ""}">${SHORT[p]}</span>`).join("");
   return `<div class="track" role="img" aria-label="Etapa actual: ${esc(estado)}">
-    <div class="rail"><span class="fill" style="width:${w}%"></span>${nodes}</div>
-    <div class="tlabels">${labels}</div>
+    <div class="rail" style="--n:${n}; grid-template-columns:repeat(${n},1fr)"><span class="fill" style="width:${w}%"></span>${nodes}</div>
+    <div class="tlabels" style="grid-template-columns:repeat(${n},1fr)">${labels}</div>
     <div class="tnow">Etapa ${idx+1} de ${n} · <b>${SHORT[estado]}</b></div>
   </div>`;
 }

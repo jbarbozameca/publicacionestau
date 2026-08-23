@@ -14,7 +14,9 @@ STATUS_MAP = {
     'ACEPTADO': 'Aceptado',
     'PEER-REVIEW (R1)': 'En peer review (R1)',
     'PEER REVIEW (R1)': 'En peer review (R1)',
-    'PEER REVIEW': 'En peer review (R1)',
+    'PEER-REVIEW': 'En peer review',
+    'PEER REVIEW': 'En peer review',
+    'POR ENVIAR A REVISTA': 'Por enviar a revista',
     'ENVIADO': 'Enviado',
     'EN REDACCIÓN': 'En redacción',
     'EN REDACCION': 'En redacción',
@@ -42,7 +44,7 @@ def norm_status(s):
     key = re.sub(r'\s+', ' ', s.upper().strip())
     if key in STATUS_MAP:
         return STATUS_MAP[key]
-    for k, v in STATUS_MAP.items():
+    for k, v in sorted(STATUS_MAP.items(), key=lambda kv: -len(kv[0])):
         if key.startswith(k):
             return v
     return s.title()
