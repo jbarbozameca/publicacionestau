@@ -1,0 +1,359 @@
+<title>Transparencia Tau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#F4F6F8; --surface:#FFFFFF; --surface-2:#EDF0F4;
+  --ink:#12151A; --ink-2:#4A5260; --ink-3:#79828F;
+  --rule:#D9DEE5; --rule-2:#C3CAD4;
+  --accent:#13345F; --accent-soft:#E3EAF3; --on-accent:#FFFFFF;
+  --ok:#146B4F; --ok-soft:#E1F0E9;
+  --wait:#7A5410; --wait-soft:#F6EDDC;
+  --stop:#992A20; --stop-soft:#F7E5E2;
+  --draft:#5C6472; --draft-soft:#E8EBEF;
+  --shadow:0 1px 2px rgba(18,21,26,.05), 0 8px 24px -16px rgba(18,21,26,.22);
+  --logo-filter:none;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1015; --surface:#151920; --surface-2:#1D222B;
+    --ink:#E8ECF2; --ink-2:#A6AFBC; --ink-3:#79828F;
+    --rule:#272D37; --rule-2:#39414D;
+    --accent:#8FB3E0; --accent-soft:#1A2432; --on-accent:#0D1015;
+    --ok:#6FCFA8; --ok-soft:#12261F;
+    --wait:#E5BE7A; --wait-soft:#2A2213;
+    --stop:#F0968A; --stop-soft:#2C1815;
+    --draft:#98A1AF; --draft-soft:#20252E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+    --logo-filter:invert(1);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1015; --surface:#151920; --surface-2:#1D222B;
+  --ink:#E8ECF2; --ink-2:#A6AFBC; --ink-3:#79828F;
+  --rule:#272D37; --rule-2:#39414D;
+  --accent:#8FB3E0; --accent-soft:#1A2432; --on-accent:#0D1015;
+  --ok:#6FCFA8; --ok-soft:#12261F;
+  --wait:#E5BE7A; --wait-soft:#2A2213;
+  --stop:#F0968A; --stop-soft:#2C1815;
+  --draft:#98A1AF; --draft-soft:#20252E;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+  --logo-filter:invert(1);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px; margin:0 auto; padding:0 20px}
+a{color:inherit}
+button{font:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+
+/* ---------- portada ---------- */
+.hero{padding:64px 0 20px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:18px}
+.mark{width:96px; height:auto; filter:var(--logo-filter); opacity:.92}
+.masthead{font-family:"Instrument Serif",Georgia,serif; font-weight:400; font-size:clamp(38px,6.4vw,60px); line-height:1.02; margin:0; letter-spacing:-.01em; text-wrap:balance}
+.masthead em{font-style:italic; color:var(--accent)}
+.kicker{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); margin:0}
+.lede{max-width:56ch; margin:0; color:var(--ink-2); font-size:15.5px}
+
+/* ---------- buscador ---------- */
+.searchbox{position:relative; width:100%; max-width:620px; margin-top:6px}
+.searchfield{display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--rule-2); border-radius:14px; padding:4px 6px 4px 16px; box-shadow:var(--shadow); transition:border-color .18s, box-shadow .18s}
+.searchbox.is-open .searchfield,.searchfield:focus-within{border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-soft), var(--shadow)}
+.searchfield svg{flex:none; color:var(--ink-3)}
+#q{flex:1; border:0; background:none; padding:12px 0; font-size:16px; color:var(--ink); min-width:0}
+#q:focus{outline:none}
+#q::placeholder{color:var(--ink-3)}
+.go{border:0; background:var(--accent); color:var(--on-accent); padding:11px 18px; border-radius:10px; font-weight:600; font-size:14px}
+.go:hover{opacity:.88}
+.suggest{position:absolute; z-index:30; left:0; right:0; top:calc(100% + 8px); background:var(--surface); border:1px solid var(--rule); border-radius:12px; box-shadow:var(--shadow); overflow:hidden; display:none; text-align:left; max-height:340px; overflow-y:auto}
+.searchbox.is-open .suggest{display:block}
+.sug{display:flex; align-items:baseline; gap:10px; width:100%; border:0; background:none; padding:10px 16px; text-align:left; border-bottom:1px solid var(--rule)}
+.sug:last-child{border-bottom:0}
+.sug:hover,.sug[aria-selected="true"]{background:var(--surface-2)}
+.sug .nm{font-weight:500}
+.sug .ty{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin-left:auto; flex:none}
+.sug .ct{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-3)}
+
+.quick{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:4px}
+.chip{border:1px solid var(--rule-2); background:var(--surface); border-radius:999px; padding:6px 13px; font-size:13px; color:var(--ink-2)}
+.chip:hover{border-color:var(--accent); color:var(--accent)}
+
+/* ---------- barra de cifras ---------- */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(126px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:12px; overflow:hidden; margin:34px 0 8px}
+.stat{background:var(--surface); padding:14px 16px}
+.stat b{display:block; font-family:"Instrument Serif",Georgia,serif; font-size:30px; line-height:1.1; font-weight:400; font-variant-numeric:tabular-nums}
+.stat span{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
+.stat.s-ok b{color:var(--ok)} .stat.s-wait b{color:var(--accent)} .stat.s-stop b{color:var(--stop)}
+
+/* ---------- resultados ---------- */
+.results{padding:22px 0 60px}
+.rhead{display:flex; flex-wrap:wrap; align-items:baseline; gap:12px; padding-bottom:14px; margin-bottom:18px; border-bottom:2px solid var(--ink)}
+.rhead h2{font-family:"Instrument Serif",Georgia,serif; font-weight:400; font-size:30px; margin:0; letter-spacing:-.01em}
+.rhead .count{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-3); margin-left:auto}
+.back{border:1px solid var(--rule-2); background:var(--surface); border-radius:999px; padding:5px 13px; font-size:13px; color:var(--ink-2)}
+.back:hover{border-color:var(--accent); color:var(--accent)}
+
+.filters{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px}
+.filters button{border:1px solid var(--rule); background:var(--surface); border-radius:999px; padding:5px 12px; font-size:12.5px; color:var(--ink-2)}
+.filters button[aria-pressed="true"]{background:var(--accent); color:var(--on-accent); border-color:var(--accent)}
+
+.card{background:var(--surface); border:1px solid var(--rule); border-radius:14px; padding:20px 22px; margin-bottom:14px; box-shadow:var(--shadow)}
+.card .meta{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:9px}
+.tag{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; padding:3px 9px; border-radius:999px; background:var(--surface-2); color:var(--ink-2); border:1px solid var(--rule)}
+.tag.grp{background:var(--accent-soft); color:var(--accent); border-color:transparent}
+.state{font-size:12px; font-weight:600; letter-spacing:.02em; padding:3px 11px; border-radius:999px}
+.state.ok{background:var(--ok-soft); color:var(--ok)}
+.state.wait{background:var(--wait-soft); color:var(--wait)}
+.state.stop{background:var(--stop-soft); color:var(--stop)}
+.state.draft{background:var(--draft-soft); color:var(--draft)}
+.card h3{font-family:"Instrument Serif",Georgia,serif; font-weight:400; font-size:22px; line-height:1.25; margin:0 0 12px; letter-spacing:-.005em; text-wrap:balance}
+
+/* pista tipo forest plot */
+.track{margin:16px 0 15px}
+.rail{position:relative; display:grid; grid-template-columns:repeat(6,1fr); align-items:center; height:16px}
+.rail::before{content:""; position:absolute; left:8.333%; right:8.333%; top:50%; height:1px; background:var(--rule-2); transform:translateY(-50%)}
+.rail .fill{position:absolute; left:8.333%; top:50%; height:2px; background:var(--accent); transform:translateY(-50%)}
+.node{justify-self:center; position:relative; width:8px; height:8px; border-radius:50%; background:var(--surface); border:1.5px solid var(--rule-2); box-sizing:border-box}
+.node.done{background:var(--accent); border-color:var(--accent)}
+.node.on{width:11px; height:11px; border-radius:2px; background:var(--accent); border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-soft)}
+.tlabels{display:grid; grid-template-columns:repeat(6,1fr); margin-top:8px}
+.tlabels .tl{font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); text-align:center}
+.tlabels .tl.on{color:var(--accent); font-weight:500}
+.tnow{display:none; font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); margin-top:8px}
+.tnow b{color:var(--accent); font-weight:500}
+@media (max-width:620px){ .tlabels{display:none} .tnow{display:block} }
+.rejected-note{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--stop); margin:14px 0 10px}
+
+.dl{display:grid; grid-template-columns:auto 1fr; gap:6px 16px; font-size:14px; margin:4px 0 0; align-items:baseline}
+.dl dt{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); padding-top:3px}
+.dl dd{margin:0; color:var(--ink)}
+.dl a{color:var(--accent); text-underline-offset:2px}
+.obs{color:var(--ink-2)}
+.q{font-family:"IBM Plex Mono",monospace; font-size:11px; border:1px solid var(--rule-2); border-radius:4px; padding:1px 6px; margin-left:7px; color:var(--ink-2)}
+
+.authors{margin-top:14px; padding-top:13px; border-top:1px dashed var(--rule)}
+.authors .al{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); margin-bottom:7px}
+.authors ul{display:flex; flex-wrap:wrap; gap:6px; list-style:none; margin:0; padding:0}
+.au{border:1px solid var(--rule); background:var(--surface-2); border-radius:999px; padding:3px 11px; font-size:12.5px; color:var(--ink-2)}
+.au:hover{border-color:var(--accent); color:var(--accent)}
+.au.me{background:var(--accent); color:var(--on-accent); border-color:var(--accent); font-weight:500}
+.raw{font-size:13px; color:var(--ink-2); margin-top:2px}
+
+.empty{text-align:center; padding:46px 20px; border:1px dashed var(--rule-2); border-radius:14px; color:var(--ink-2)}
+.empty strong{display:block; font-family:"Instrument Serif",Georgia,serif; font-size:24px; font-weight:400; color:var(--ink); margin-bottom:6px}
+
+/* ---------- pie ---------- */
+.notice{display:flex; gap:14px; align-items:flex-start; background:var(--surface); border:1px solid var(--rule); border-left:3px solid var(--accent); border-radius:10px; padding:14px 18px; margin:26px 0; font-size:13.5px; color:var(--ink-2)}
+.notice b{color:var(--ink)}
+footer{border-top:1px solid var(--rule); padding:24px 0 50px; font-size:12.5px; color:var(--ink-3); display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; justify-content:space-between}
+footer .mono{font-family:"IBM Plex Mono",monospace}
+.hidden{display:none !important}
+@media (max-width:560px){
+  .hero{padding-top:44px}
+  .card{padding:17px 16px}
+  .dl{grid-template-columns:1fr; gap:2px 0}
+  .dl dt{padding-top:8px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important}}
+</style>
+
+<div class="wrap">
+  <section class="hero" id="hero">
+    <img class="mark" alt="Tau Clinical Research" src="data:image/png;base64,__LOGO__">
+    <p class="kicker">Tau Clinical Research · Transparencia 2024–2026</p>
+    <h1 class="masthead">¿En qué va <em>tu</em> manuscrito?</h1>
+    <p class="lede">Escribe tu nombre y apellido para ver todos los trabajos en los que participas, su estado editorial, la revista y las observaciones del equipo.</p>
+
+    <div class="searchbox" id="sbox">
+      <div class="searchfield">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Ej.: Barboza, Calzada, Tejada… o el título del trabajo" aria-label="Buscar por autor o título">
+        <button class="go" id="goBtn">Buscar</button>
+      </div>
+      <div class="suggest" id="sug" role="listbox"></div>
+    </div>
+
+    <div class="quick" id="quick"></div>
+  </section>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="notice">
+    <span aria-hidden="true">🗓️</span>
+    <div><b>Este portal se actualiza cada lunes.</b> La información corresponde al corte del <span class="mono" id="fecha"></span>. Si tu trabajo cambió de estado después de esa fecha, se reflejará en la siguiente actualización.</div>
+  </div>
+
+  <section class="results hidden" id="results"></section>
+
+  <footer>
+    <span>Tau Clinical Research · Portal de transparencia de investigaciones</span>
+    <span class="mono" id="foot"></span>
+  </footer>
+</div>
+
+<script>
+const DATA = /*__DATA__*/;
+const PIPE = ["En redacción","En proceso","Enviado","En peer review (R1)","Aceptado","Publicado"];
+const SHORT = {"En redacción":"Redacción","En proceso":"Proceso","Enviado":"Enviado","En peer review (R1)":"Peer review","Aceptado":"Aceptado","Publicado":"Publicado"};
+const TONE = {"Publicado":"ok","Aceptado":"ok","En peer review (R1)":"wait","Enviado":"wait","En proceso":"draft","En redacción":"draft","Rechazado":"stop","Sin estado":"draft"};
+
+const norm = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9\u00f1]+/g," ").trim();
+const esc = s => (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const R = DATA.registros;
+R.forEach(r => { r._a = norm(r.autoresRaw + " " + r.autores.join(" ")); r._t = norm(r.titulo); r._g = norm(r.grupo); });
+
+/* ------- cifras ------- */
+const count = st => R.filter(r => r.estado === st).length;
+document.getElementById("stats").innerHTML = [
+  ["", R.length, "trabajos"],
+  ["s-ok", count("Publicado") + count("Aceptado"), "publicados o aceptados"],
+  ["s-wait", count("Enviado") + count("En peer review (R1)"), "en revista"],
+  ["", count("En redacción") + count("En proceso"), "en redacción"],
+  ["s-stop", count("Rechazado"), "por reenviar"],
+  ["", DATA.autores.length, "autores"]
+].map(([c,n,l]) => `<div class="stat ${c}"><b>${n}</b><span>${l}</span></div>`).join("");
+
+const fechaTxt = new Date(DATA.actualizado + "T12:00:00").toLocaleDateString("es-PE",{day:"2-digit",month:"long",year:"numeric"});
+document.getElementById("fecha").textContent = fechaTxt;
+document.getElementById("foot").textContent = "Corte: " + fechaTxt + " · próxima actualización: lunes";
+
+/* ------- accesos rápidos ------- */
+const grupos = [...new Set(R.map(r => r.grupo))].filter(g => g !== "Sin grupo asignado");
+document.getElementById("quick").innerHTML =
+  `<button class="chip" data-all="1">Ver los ${R.length} trabajos</button>` +
+  grupos.slice(0,5).map(g => `<button class="chip" data-grp="${esc(g)}">${esc(g)}</button>`).join("");
+
+/* ------- autocompletado ------- */
+const q = document.getElementById("q"), sbox = document.getElementById("sbox"), sug = document.getElementById("sug");
+let sugItems = [], cur = -1;
+
+function buildSug(v){
+  const n = norm(v);
+  if(n.length < 2) return [];
+  const toks = n.split(" ");
+  const ppl = DATA.autores.filter(a => toks.every(t => norm(a.nombre).includes(t)))
+     .sort((x,y) => y.n - x.n).slice(0,6)
+     .map(a => ({t:"autor", label:a.nombre, extra:a.n + (a.n===1?" trabajo":" trabajos"), q:a.nombre}));
+  const grp = grupos.filter(g => norm(g).includes(n)).slice(0,3)
+     .map(g => ({t:"grupo", label:g, extra:R.filter(r=>r.grupo===g).length+" trabajos", q:g}));
+  const tit = R.filter(r => r._t.includes(n)).slice(0,4)
+     .map(r => ({t:"trabajo", label:r.titulo.length>72 ? r.titulo.slice(0,72)+"…" : r.titulo, extra:"", q:r.titulo}));
+  return [...ppl, ...grp, ...tit].slice(0,10);
+}
+function renderSug(){
+  if(!sugItems.length){ sbox.classList.remove("is-open"); return; }
+  sug.innerHTML = sugItems.map((s,i)=>`<button class="sug" role="option" data-i="${i}" aria-selected="${i===cur}"><span class="nm">${esc(s.label)}</span>${s.extra?`<span class="ct">${esc(s.extra)}</span>`:""}<span class="ty">${s.t}</span></button>`).join("");
+  sbox.classList.add("is-open");
+}
+q.addEventListener("input", () => { sugItems = buildSug(q.value); cur = -1; renderSug(); });
+q.addEventListener("keydown", e => {
+  if(e.key === "ArrowDown" || e.key === "ArrowUp"){
+    e.preventDefault(); if(!sugItems.length) return;
+    cur = (cur + (e.key === "ArrowDown" ? 1 : -1) + sugItems.length) % sugItems.length;
+    renderSug();
+  } else if(e.key === "Enter"){
+    e.preventDefault();
+    search(cur >= 0 ? sugItems[cur].q : q.value);
+  } else if(e.key === "Escape"){ sbox.classList.remove("is-open"); }
+});
+sug.addEventListener("click", e => { const b = e.target.closest(".sug"); if(b) search(sugItems[+b.dataset.i].q); });
+document.addEventListener("click", e => { if(!sbox.contains(e.target)) sbox.classList.remove("is-open"); });
+document.getElementById("goBtn").addEventListener("click", () => search(q.value));
+document.getElementById("quick").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.all) showAll(); else search(b.dataset.grp);
+});
+
+/* ------- búsqueda ------- */
+let state = {list:[], title:"", who:"", filter:"todos"};
+
+function search(v){
+  const raw = (v||"").trim(); const n = norm(raw);
+  sbox.classList.remove("is-open"); q.value = raw;
+  if(n.length < 2){ q.focus(); return; }
+  const toks = n.split(" ");
+  const byAuthor = R.filter(r => toks.every(t => r._a.includes(t)));
+  const byOther  = R.filter(r => !byAuthor.includes(r) && (r._t.includes(n) || r._g.includes(n) || norm(r.revista).includes(n)));
+  const list = [...byAuthor, ...byOther];
+  const who = byAuthor.length ? (DATA.autores.find(a => toks.every(t => norm(a.nombre).includes(t)))?.nombre || raw) : "";
+  state = {list, title: raw, who, filter:"todos"};
+  render();
+}
+function showAll(){ state = {list:R.slice(), title:"", who:"", filter:"todos"}; render(); }
+
+const ORD = st => { const i = PIPE.indexOf(st); return i < 0 ? (st === "Rechazado" ? -1 : 99) : i; };
+
+function trackSVG(estado){
+  const idx = PIPE.indexOf(estado), n = PIPE.length;
+  const span = 100 - (100 / n);                 /* del centro de la 1ª al centro de la última columna */
+  const w = idx > 0 ? (span * idx / (n - 1)) : 0;
+  const nodes = PIPE.map((p,i) => `<span class="node ${i === idx ? "on" : (idx >= 0 && i < idx ? "done" : "")}"></span>`).join("");
+  const labels = PIPE.map((p,i) => `<span class="tl${i === idx ? " on" : ""}">${SHORT[p]}</span>`).join("");
+  return `<div class="track" role="img" aria-label="Etapa actual: ${esc(estado)}">
+    <div class="rail"><span class="fill" style="width:${w}%"></span>${nodes}</div>
+    <div class="tlabels">${labels}</div>
+    <div class="tnow">Etapa ${idx+1} de ${n} · <b>${SHORT[estado]}</b></div>
+  </div>`;
+}
+
+function card(r){
+  const tone = TONE[r.estado] || "draft";
+  const inPipe = PIPE.includes(r.estado);
+  const meAuthors = state.who ? norm(state.who) : "";
+  const chips = r.autores.length
+    ? `<ul>${r.autores.map(a => `<li><button class="au ${meAuthors && norm(a) === meAuthors ? "me" : ""}" data-au="${esc(a)}">${esc(a)}</button></li>`).join("")}</ul>`
+    : (r.autoresRaw ? `<p class="raw">${esc(r.autoresRaw)}</p>` : `<p class="raw">Autores aún no registrados en el consolidado.</p>`);
+  const rows = [];
+  if(r.revista) rows.push(["Revista", esc(r.revista) + (r.cuartil ? `<span class="q">${esc(r.cuartil)}</span>` : "")]);
+  else rows.push(["Revista", `<span class="obs">Pendiente de asignación</span>`]);
+  if(r.link) rows.push(["Enlace", `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.link.replace(/^https?:\/\//,"").slice(0,58))}…</a>`]);
+  if(r.obs) rows.push(["Observación", `<span class="obs">${esc(r.obs)}</span>`]);
+  return `<article class="card">
+    <div class="meta">
+      <span class="state ${tone}">${esc(r.estado)}</span>
+      ${r.grupo !== "Sin grupo asignado" ? `<span class="tag grp">${esc(r.grupo)}</span>` : ""}
+      <span class="tag">${esc(r.seccion)}</span>
+    </div>
+    <h3>${esc(r.titulo)}</h3>
+    ${inPipe ? trackSVG(r.estado) : ""}
+    ${r.estado === "Rechazado" ? `<p class="rejected-note">✕ Rechazado por la revista — pendiente de reenvío a una nueva revista.</p>` : ""}
+    <dl class="dl">${rows.map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
+    <div class="authors"><div class="al">Equipo de autores (${r.autores.length || "—"})</div>${chips}</div>
+  </article>`;
+}
+
+function render(){
+  const el = document.getElementById("results");
+  el.classList.remove("hidden");
+  const all = state.list;
+  const states = [...new Set(all.map(r => r.estado))].sort((a,b) => ORD(b) - ORD(a));
+  const list = state.filter === "todos" ? all : all.filter(r => r.estado === state.filter);
+  const sorted = list.slice().sort((a,b) => ORD(b) - ORD(a));
+  const title = state.who ? state.who : (state.title ? `“${state.title}”` : "Todos los trabajos");
+
+  el.innerHTML = `
+    <div class="rhead">
+      <h2>${esc(title)}</h2>
+      <button class="back" id="backBtn">← Nueva búsqueda</button>
+      <span class="count">${all.length} ${all.length === 1 ? "trabajo" : "trabajos"}</span>
+    </div>
+    ${all.length ? `<div class="filters">
+      <button data-f="todos" aria-pressed="${state.filter === "todos"}">Todos · ${all.length}</button>
+      ${states.map(s => `<button data-f="${esc(s)}" aria-pressed="${state.filter === s}">${esc(s)} · ${all.filter(r => r.estado === s).length}</button>`).join("")}
+    </div>` : ""}
+    ${sorted.length ? sorted.map(card).join("") : `<div class="empty"><strong>Sin resultados</strong>Revisa la escritura del apellido o busca solo por el apellido (ej.: <em>Calzada</em>). Si acabas de incorporarte, tu trabajo aparecerá en la actualización del próximo lunes.</div>`}
+  `;
+  el.querySelector("#backBtn")?.addEventListener("click", () => {
+    el.classList.add("hidden"); q.value = ""; q.focus();
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+  el.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => { state.filter = b.dataset.f; render(); }));
+  el.querySelectorAll(".au").forEach(b => b.addEventListener("click", () => { search(b.dataset.au); }));
+  el.scrollIntoView({behavior:"smooth", block:"start"});
+}
+</script>
