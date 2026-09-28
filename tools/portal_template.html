@@ -202,7 +202,7 @@ footer .mono{font-family:"IBM Plex Mono",monospace}
 const DATA = /*__DATA__*/;
 const PIPE = ["En redacción","Por enviar a revista","Enviado","En peer review","En peer review (R1)","Aceptado","Publicado"];
 const SHORT = {"En redacción":"Redacción","Por enviar a revista":"Por enviar","Enviado":"Enviado","En peer review":"Peer review","En peer review (R1)":"Peer review R1","Aceptado":"Aceptado","Publicado":"Publicado"};
-const TONE = {"Publicado":"ok","Aceptado":"ok","En peer review (R1)":"wait","En peer review":"wait","Enviado":"wait","Por enviar a revista":"draft","En proceso":"draft","En redacción":"draft","Rechazado":"stop","Sin estado":"draft"};
+const TONE = {"Publicado":"ok","Aceptado":"ok","En peer review (R1)":"wait","En peer review":"wait","Enviado":"wait","Por enviar a revista":"draft","En proceso":"draft","En redacción":"draft","Rechazado":"stop","Sin estado":"draft","Pendiente de reestructuración":"draft"};
 
 const norm = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9\u00f1]+/g," ").trim();
 const esc = s => (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -215,7 +215,7 @@ document.getElementById("stats").innerHTML = [
   ["", R.length, "trabajos"],
   ["s-ok", count("Publicado") + count("Aceptado"), "publicados o aceptados"],
   ["s-wait", count("Enviado") + count("En peer review") + count("En peer review (R1)"), "en revista"],
-  ["", count("En redacción") + count("En proceso") + count("Por enviar a revista"), "en preparación"],
+  ["", count("En redacción") + count("En proceso") + count("Por enviar a revista") + count("Pendiente de reestructuración"), "en preparación"],
   ["s-stop", count("Rechazado"), "por reenviar"],
   ["", DATA.autores.length, "autores"]
 ].map(([c,n,l]) => `<div class="stat ${c}"><b>${n}</b><span>${l}</span></div>`).join("");
@@ -288,7 +288,7 @@ function search(v){
 }
 function showAll(){ state = {list:R.slice(), title:"", who:"", filter:"todos"}; render(); }
 
-const ORD = st => { const i = PIPE.indexOf(st); return i < 0 ? (st === "Rechazado" ? -1 : 99) : i; };
+const ORD = st => { const i = PIPE.indexOf(st); return i < 0 ? (st === "Rechazado" || st === "Pendiente de reestructuración" ? -1 : 99) : i; };
 
 function trackSVG(estado){
   const idx = PIPE.indexOf(estado), n = PIPE.length;
