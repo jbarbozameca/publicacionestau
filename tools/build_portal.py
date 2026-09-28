@@ -24,7 +24,8 @@ if not xlsx:
 subprocess.run([sys.executable, str(HERE / 'build_data.py'), xlsx, str(HERE / 'data.json')], check=True)
 
 data = json.load(open(HERE / 'data.json', encoding='utf-8'))
-data['actualizado'] = datetime.date.today().isoformat()
+from zoneinfo import ZoneInfo
+data['actualizado'] = datetime.datetime.now(ZoneInfo('America/Lima')).date().isoformat()  # fecha de Perú
 tpl = (HERE / 'portal_template.html').read_text(encoding='utf-8')
 logo = base64.b64encode((HERE / 'mark.png').read_bytes()).decode()
 
