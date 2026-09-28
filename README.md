@@ -20,7 +20,7 @@ data/TRANSPARENCIA - INVESTIGACIONES Tau 2024-2026.xlsx  ← fuente de datos
 `index.html` es un único archivo sin dependencias externas (salvo las tipografías de Google Fonts),
 así que funciona en GitHub Pages sin configuración adicional.
 
-## Actualizar el portal (cada lunes)
+## Actualizar el portal (cada domingo)
 
 1. Reemplaza el Excel en `data/` por la versión actualizada.
 2. Ejecuta:
