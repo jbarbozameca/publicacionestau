@@ -89,7 +89,20 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 /* ---------- barra de cifras ---------- */
 .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(126px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:12px; overflow:hidden; margin:34px 0 8px}
-.stat{background:var(--surface); padding:14px 16px}
+.stat{background:var(--surface); padding:14px 16px; border:0; border-radius:0; width:100%; text-align:left; position:relative; transition:background .15s}
+.stat:hover{background:var(--accent-soft)}
+.stat:hover span,.stat[aria-pressed="true"] span{color:var(--accent)}
+.stat[aria-pressed="true"]{background:var(--accent-soft); box-shadow:inset 0 -3px 0 var(--accent)}
+.stat:focus-visible{outline-offset:-3px}
+.stat i{position:absolute; top:12px; right:14px; font-style:normal; font-size:14px; color:var(--ink-3); opacity:0; transition:opacity .15s, transform .15s}
+.stat:hover i{opacity:1; transform:translateX(2px)}
+.stats-hint{text-align:center; font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.06em; color:var(--ink-3); margin:0 0 8px}
+.aufilter{width:100%; max-width:360px; border:1px solid var(--rule-2); background:var(--surface); color:var(--ink); border-radius:10px; padding:9px 13px; font:inherit; font-size:14px; margin-bottom:16px}
+.aufilter:focus{outline:none; border-color:var(--accent)}
+.augrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:8px}
+.aubtn{display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid var(--rule); background:var(--surface); border-radius:10px; padding:9px 13px; text-align:left; font-size:14px; color:var(--ink)}
+.aubtn:hover{border-color:var(--accent); color:var(--accent)}
+.aubtn span{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-3); flex:none}
 .stat b{display:block; font-family:"Instrument Serif",Georgia,serif; font-size:30px; line-height:1.1; font-weight:400; font-variant-numeric:tabular-nums}
 .stat span{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
 .stat.s-ok b{color:var(--ok)} .stat.s-wait b{color:var(--accent)} .stat.s-stop b{color:var(--stop)}
@@ -214,15 +227,30 @@ const R = DATA.registros;
 R.forEach(r => { r._a = norm(r.autoresRaw + " " + r.autores.join(" ")); r._t = norm(r.titulo); r._g = norm(r.grupo); });
 
 /* ------- cifras ------- */
-const count = st => R.filter(r => r.estado === st).length;
-document.getElementById("stats").innerHTML = [
-  ["", R.length, "trabajos"],
-  ["s-ok", count("Publicado") + count("Aceptado"), "publicados o aceptados"],
-  ["s-wait", count("Enviado") + count("En peer review") + count("En peer review (R1)"), "en revista"],
-  ["", count("En redacción") + count("En proceso") + count("Por enviar a revista") + count("Pendiente de reestructuración"), "en preparación"],
-  ["s-stop", count("Rechazado"), "por reenviar"],
-  ["", DATA.autores.length, "autores"]
-].map(([c,n,l]) => `<div class="stat ${c}"><b>${n}</b><span>${l}</span></div>`).join("");
+const STATS = [
+  {k:"todos",  c:"",       l:"trabajos",               h:"Todos los trabajos",      st:null},
+  {k:"ok",     c:"s-ok",   l:"publicados o aceptados", h:"Publicados o aceptados",  st:["Publicado","Aceptado"]},
+  {k:"wait",   c:"s-wait", l:"en revista",             h:"En revista",              st:["Enviado","En peer review","En peer review (R1)"]},
+  {k:"prep",   c:"",       l:"en preparación",         h:"En preparación",          st:["En redacción","En proceso","Por enviar a revista","Pendiente de reestructuración","Sin estado"]},
+  {k:"stop",   c:"s-stop", l:"por reenviar",           h:"Por reenviar a otra revista", st:["Rechazado"]},
+  {k:"autores",c:"",       l:"autores",                h:"Autores",                 st:null}
+];
+const inStat = (s, r) => !s.st || s.st.includes(r.estado);
+const statsEl = document.getElementById("stats");
+statsEl.innerHTML = STATS.map(s => {
+  const n = s.k === "autores" ? DATA.autores.length : R.filter(r => inStat(s, r)).length;
+  return `<button class="stat ${s.c}" data-k="${s.k}" aria-pressed="false" title="Ver ${esc(s.h.toLowerCase())}"><b>${n}</b><span>${s.l}</span><i aria-hidden="true">→</i></button>`;
+}).join("");
+statsEl.insertAdjacentHTML("afterend", `<p class="stats-hint">Haz clic en una cifra para ver el detalle</p>`);
+statsEl.addEventListener("click", e => {
+  const b = e.target.closest(".stat"); if(!b) return;
+  const s = STATS.find(x => x.k === b.dataset.k);
+  q.value = ""; sbox.classList.remove("is-open");
+  if(s.k === "autores"){ showAuthors(); return; }
+  state = {list: R.filter(r => inStat(s, r)), title:"", who:"", filter:"todos", heading: s.h, k: s.k};
+  render();
+});
+const markStat = k => statsEl.querySelectorAll(".stat").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === k)));
 
 const fechaTxt = new Date(DATA.actualizado + "T12:00:00").toLocaleDateString("es-PE",{day:"2-digit",month:"long",year:"numeric"});
 document.getElementById("fecha").textContent = fechaTxt;
@@ -291,7 +319,34 @@ function search(v){
   state = {list, title: raw, who, filter:"todos"};
   render();
 }
-function showAll(){ state = {list:R.slice(), title:"", who:"", filter:"todos"}; render(); }
+function showAll(){ state = {list:R.slice(), title:"", who:"", filter:"todos", k:"todos"}; render(); }
+
+function showAuthors(){
+  const el = document.getElementById("results");
+  el.classList.remove("hidden"); markStat("autores");
+  const A = DATA.autores.slice().sort((x,y) => y.n - x.n || x.nombre.localeCompare(y.nombre, "es"));
+  el.innerHTML = `
+    <div class="rhead">
+      <h2>Autores</h2>
+      <button class="back" id="backBtn">← Nueva búsqueda</button>
+      <span class="count">${A.length} autores</span>
+    </div>
+    <input class="aufilter" id="auf" type="search" placeholder="Filtrar autores por nombre…" aria-label="Filtrar autores">
+    <div class="augrid" id="aug"></div>`;
+  const grid = el.querySelector("#aug");
+  const paint = v => { const n = norm(v); const toks = n ? n.split(" ") : [];
+    const L = A.filter(a => toks.every(t => norm(a.nombre).includes(t)));
+    grid.innerHTML = L.length ? L.map(a => `<button class="aubtn" data-au="${esc(a.nombre)}">${esc(a.nombre)}<span>${a.n}</span></button>`).join("")
+      : `<div class="empty" style="grid-column:1/-1"><strong>Sin coincidencias</strong>Prueba solo con el apellido.</div>`; };
+  paint("");
+  el.querySelector("#auf").addEventListener("input", e => paint(e.target.value));
+  grid.addEventListener("click", e => { const b = e.target.closest(".aubtn"); if(b) search(b.dataset.au); });
+  el.querySelector("#backBtn").addEventListener("click", () => {
+    el.classList.add("hidden"); markStat(null); q.value = ""; q.focus();
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+  el.scrollIntoView({behavior:"smooth", block:"start"});
+}
 
 const ORD = st => { const i = PIPE.indexOf(st); return i < 0 ? (st === "Rechazado" || st === "Pendiente de reestructuración" ? -1 : 99) : i; };
 
@@ -341,7 +396,8 @@ function render(){
   const states = [...new Set(all.map(r => r.estado))].sort((a,b) => ORD(b) - ORD(a));
   const list = state.filter === "todos" ? all : all.filter(r => r.estado === state.filter);
   const sorted = list.slice().sort((a,b) => ORD(b) - ORD(a));
-  const title = state.who ? state.who : (state.title ? `“${state.title}”` : "Todos los trabajos");
+  const title = state.heading ? state.heading : (state.who ? state.who : (state.title ? `“${state.title}”` : "Todos los trabajos"));
+  markStat(state.k || null);
 
   el.innerHTML = `
     <div class="rhead">
@@ -356,7 +412,7 @@ function render(){
     ${sorted.length ? sorted.map(card).join("") : `<div class="empty"><strong>Sin resultados</strong>Revisa la escritura del apellido o busca solo por el apellido (ej.: <em>Calzada</em>). Si acabas de incorporarte, tu trabajo aparecerá en la actualización del próximo domingo.</div>`}
   `;
   el.querySelector("#backBtn")?.addEventListener("click", () => {
-    el.classList.add("hidden"); q.value = ""; q.focus();
+    el.classList.add("hidden"); markStat(null); q.value = ""; q.focus();
     window.scrollTo({top:0, behavior:"smooth"});
   });
   el.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => { state.filter = b.dataset.f; render(); }));
