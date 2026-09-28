@@ -22,6 +22,10 @@ STATUS_MAP = {
     'EN REDACCION': 'En redacción',
     'EN PROCESO': 'En proceso',
     'RECHAZADO': 'Rechazado',
+    'PENDIENTE DE RE-ESTRUCTURACIÓN': 'Pendiente de reestructuración',
+    'PENDIENTE DE RE-ESTRUCTURACION': 'Pendiente de reestructuración',
+    'PENDIENTE DE REESTRUCTURACIÓN': 'Pendiente de reestructuración',
+    'PENDIENTE DE REESTRUCTURACION': 'Pendiente de reestructuración',
 }
 
 NOISE = re.compile(r'(universidad|university|facultad|school of|department|departamento|hospital|instituto|institute|escuela|centro de|research center|peru|perú|méxico|mexico|colombia|ecuador|chile|españa|spain|argentina|brasil)', re.I)
