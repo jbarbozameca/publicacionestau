@@ -22,6 +22,9 @@ STATUS_MAP = {
     'EN REDACCION': 'En redacción',
     'EN PROCESO': 'En proceso',
     'RECHAZADO': 'Rechazado',
+    'EN PEER REVIEW (R1)': 'En peer review (R1)',
+    'EN PEER REVIEW': 'En peer review',
+    'EN PROTOCOLO': 'En protocolo',
     'PENDIENTE DE RE-ESTRUCTURACIÓN': 'Pendiente de reestructuración',
     'PENDIENTE DE RE-ESTRUCTURACION': 'Pendiente de reestructuración',
     'PENDIENTE DE REESTRUCTURACIÓN': 'Pendiente de reestructuración',
@@ -130,6 +133,9 @@ def main():
         'ACEPTADOS PUBLICADOS': 'Aceptados / Publicados',
         'TRAINING': 'Training',
         'FOCUS': 'Focus',
+        'LÍNEAS': 'Líneas',
+        'LINEAS': 'Líneas',
+        'ESPECIALES': 'Grupos especiales',
     }
     for ws in wb.worksheets:
         if ws.title not in sheet_labels:
@@ -155,7 +161,7 @@ def main():
                 'autoresRaw': autores_raw,
                 'autores': parse_authors(autores_raw),
                 'estado': norm_status(v[3]),
-                'revista': v[4] if v[4] and v[4].upper() != 'PENDIENTE DE ASIGNACIÓN' else '',
+                'revista': re.sub(r'\s*\n\s*', ' ', v[4]).strip() if v[4] and v[4].upper() != 'PENDIENTE DE ASIGNACIÓN' else '',
                 'cuartil': v[5],
                 'link': v[6] if v[6].lower().startswith('http') else '',
                 'obs': re.sub(r'\s*\n\s*', ' ', v[7]).strip(),
